@@ -1,0 +1,121 @@
+---
+title: "Tareas_Series"
+format: html
+editor: visual
+---
+
+# Series Temporales
+
+## Clase1:
+
+Transformación de un data frame a **tsibble**:
+
+```{r}
+#Data Frame
+Mes <- c('2026 Jan','2026 Feb','2026 Mar','2026 Apr','2026 May','2026 Jun', '2026 Jul', '2026 Aug')
+Escuchas <- c(32,70,84,90,125,96,135,162)
+z <- data.frame(Mes,Escuchas)
+z
+```
+
+```{r}
+#install.packages("tsibble")
+library(tsibble)
+```
+
+### Transformación a tsibble
+
+```{r}
+#Transformación 
+z <- z %>% mutate(Mes = yearmonth(Mes)) %>% as_tsibble(index = Mes)
+z
+```
+
+```{r}
+#Sys.setlocale("LC_TIME", "Spanish")
+#Mes <- c('2026 Enero','2026 Febrero','2026 Marzo','2026 Abril','2026 Mayo','2026 Junio', '2026 Julio', '2026 Agosto')
+#Escuchas <- c(32,70,84,90,125,96,135,162)
+#z_ <- data.frame(Mes,Escuchas)
+#z_ <- z_ %>% mutate(Fecha = as.Date(paste("01", Mes),format = "%d %Y %B")) %>%
+ # as_tsibble(index = Fecha)
+#z_ <- z_ %>%mutate(Mes = as.Date(paste("01", Mes),format = "%d %Y %B")) %>%
+#  as_tsibble(index = Mes)
+#z_ <- z_ %>% 
+#  mutate(Mes = yearmonth(c("2026-01", "2026-02", "2026-03", "2026-04","2026-05", "2026-06", "2026-07", "2026-08"))) %>% as_tsibble(index = Mes)
+#z_
+```
+
+```{r}
+library(tidyverse)
+```
+
+## Clase 2:
+
+Exportar una base de datos de Excel y transformarla en tsibble
+
+```{r}
+library(readxl)
+dt <- read_xlsx("C:/Users/HP/Documents/Series Temporales/bases/Datos históricos Petróleo crudo WTI.xlsx",sheet=2)
+dt
+```
+
+Cambiar nombres a las 2 primeras columnas
+
+```{r}
+dt2 <- dt[,1:2]
+dt2
+names(dt2) <- c('Fecha','Precio')
+head(dt2)
+#dt2 <- dt[,1:2];names(dt2) <- c('Fecha','Precio')
+
+```
+
+Transformación a tsibble
+
+```{r}
+dt3 <- dt2 %>% mutate(Fecha=ymd(Fecha)) %>% as_tsibble(index=Fecha)
+dt3
+```
+
+## Mi base
+
+## Tarea 2
+
+Lectura de la base desde un documento csv.
+
+```{r}
+library(readr)
+data <- read.csv2("C:/Users/HP/Documents/Series Temporales/bases/inamhi-precipitacion-2019diciembre.csv")
+head(data)
+```
+
+Cambio de nombre de la columna 'anio' por 'Año'
+
+```{r}
+colnames(data)
+data2 <- data;names(data2)[names(data2) == "anio"] <- "Año"
+head(data2)
+```
+
+Transformación a tsibble, tomamos a la variable Año como índice y tomamos una clave: Estación
+
+```{r}
+library(tsibble)
+#help("tsibble")
+#data3 <- data2 %>%  mutate(Año = year(Año)) %>% as_tsibble(index = Año)
+#data3
+```
+
+```{r}
+data3 <- data2 %>% as_tsibble(key = Estacion,index = Año)
+head(data3)
+```
+
+```{r}
+#data3[52:92,]
+data3['Año']
+min(data3['Año'])
+max(data3['Año'])
+sum(is.na(data3)) #Datos NA
+sum(!is.na(data3))
+```
